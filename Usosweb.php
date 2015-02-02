@@ -83,14 +83,16 @@ class Hybrid_Providers_Usosweb extends Hybrid_Provider_Model_OAuth1
 			throw new Exception( "User profile request failed! {$this->providerId} api returned an invalid response.", 6 );
 		}
 		
+		$current_user_id = $response->id;
+		
 		/* SCHEDULE */
 		$response = $this->api->get( 'https://usosapps.uw.edu.pl/services/tt/student?fields=start_time|end_time|course_id|course_name|classtype_name' );
 		global $wpdb;
-		$wpdb->query( 'delete from schedule;' );
+		$wpdb->query( 'delete from schedule where user_id='.$current_user_id.';' );
 		foreach ($response as $value) {
 			$wpdb->insert( 
 				'schedule', 
-				array( 'user_id' => $this->user->profile->identifier, 'class_id' => $value->course_id, 'name' => $value->course_name->en,
+				array( 'user_id' => $current_user_id, 'class_id' => $value->course_id, 'name' => $value->course_name->en,
 					'start' => $value->start_time, 'end' => $value->end_time, 'type' => $value->classtype_name->en),
 				array( '%s', '%s', '%s', '%s', '%s', '%s' )
 			);
@@ -98,13 +100,13 @@ class Hybrid_Providers_Usosweb extends Hybrid_Provider_Model_OAuth1
 		
 		/* CURRENT_EDUCATION */
 		$response = $this->api->get( 'https://usosapps.uw.edu.pl/services/courses/user' );
-		$wpdb->query( 'delete from current_education;' );
+		$wpdb->query( 'delete from current_education where user_id='.$current_user_id.';' );
 		foreach ($response as $value) {
 			foreach($value as $iter) {
 				foreach($iter as $var) {
 					$wpdb->insert( 
 						'current_education', 
-						array( 'user_id' => $this->user->profile->identifier, 'name' => $var->course_name->en,
+						array( 'user_id' => $current_user_id, 'name' => $var->course_name->en,
 							'course_id' => $var->course_id),
 						array( '%s', '%s', '%s')
 					);
@@ -114,13 +116,13 @@ class Hybrid_Providers_Usosweb extends Hybrid_Provider_Model_OAuth1
 		
 		/* SUBJECTS */
 		$response = $this->api->get( 'https://usosapps.uw.edu.pl/services/courses/user?active_terms_only=false&fields=course_editions[course_name|grades]' );
-		$wpdb->query( 'delete from subjects;' );
+		$wpdb->query( 'delete from subjects where user_id='.$current_user_id.';' );
 		foreach ($response->course_editions as $value) {
 			foreach($value as $var) {
 				foreach($var->grades->course_grades as $grade) {
 					$wpdb->insert( 
 						'subjects', 
-						array( 'user_id' => $this->user->profile->identifier, 'name' => $var->course_name->en,
+						array( 'user_id' => $current_user_id, 'name' => $var->course_name->en,
 							'grade' => $grade->value_description->en),
 						array( '%s', '%s', '%s')
 					);
