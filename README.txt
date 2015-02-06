@@ -14,3 +14,9 @@ Funkcjonalnoœci :
 4) Portfolio - mo¿liwoœæ dodania oraz przegl¹dania w³asnych projektów wraz z opisem, rol¹ oraz linkiem
 5) Technologie - mo¿liwoœæ dodania technologii, które u¿ytkownik opanowa³ wraz z opisem doœwiadczenia i linkiem
 6) Nagrody - mo¿liwoœæ dodania nagród z opisem, dat¹ i linkiem
+
+/* UPDATE */
+
+Odpornoœæ na injection - u¿ycie wpdb->insert zamiast zwyk³ego query.
+
+Dynamiczne tworzenie tabel - program sprawdza istnienie niezbêdnych tabel i jeœli którejœ nie ma to j¹ tworzy (plik index.php).
